@@ -1,0 +1,29 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+
+{% endblock %}
+
+{% block body %}
+
+<div class="content">
+    <div class="col-md-2"></div>
+    <div class="col-md-8">
+        <a href="{{ path('blogIndex') }}">
+            <button class="glyphicon glyphicon-chevron-left">Back</button>
+        </a>
+        <div class="page-header">
+            <h1>{{ post.title }}</h1>
+        </div>
+
+        <p>
+            {% autoescape 'js' %}
+                {{ post.text | raw }}
+            {% endautoescape %}
+
+        </p>
+    </div>
+</div>
+
+{% endblock %}
+

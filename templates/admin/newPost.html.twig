@@ -1,0 +1,22 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Administration interface dashboard{% endblock %}
+
+{% block body %}
+
+    <h1>Create new post.</h1>
+
+    <a href="{{ path('adminLogout') }}">Logout</a>
+
+    {% for message in app.flashes('success') %}
+        <div>
+            {{ message }}
+        </div>
+    {% endfor %}
+
+
+    {{ form_start(form) }}
+    {{ form_widget(form) }}
+    {{ form_end(form) }}
+
+{% endblock %}

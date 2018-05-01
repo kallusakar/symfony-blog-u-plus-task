@@ -1,0 +1,28 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Login to the administration interface{% endblock %}
+
+{% block body %}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-4"></div>
+            <div class="col-sm-3 offset-sm-4">
+                {% for message in app.flashes('error') %}
+                    <div class="alert alert-danger" role="alert">{{ message }}</div>
+                {% endfor %}
+
+                {{ form_start(form) }}
+                    <div class="form-group">
+                        {{ form_label(form.username) }}
+                        {{ form_widget(form.username) }}
+                    </div>
+                    <div class="form-group">
+                        {{ form_label(form.password) }}
+                        {{ form_widget(form.password) }}
+                    </div>
+                    {{ form_widget(form.login) }}
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+{% endblock %}

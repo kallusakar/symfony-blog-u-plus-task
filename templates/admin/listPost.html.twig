@@ -1,0 +1,39 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+
+{% endblock %}
+
+{% block body %}
+    <div class="panel panel-default">
+        <div class="panel-heading">Posts List</div>
+
+        <table class="table">
+            <thead>
+            <tr>
+                <td>Title</td>
+                <td>Public</td>
+                <td>Views</td>
+                <td>Published At</td>
+                <td>Updated At</td>
+                <td>Actions</td>
+            </tr>
+            </thead>
+            <tbody>
+            {% for post in posts %}
+                <tr>
+                    <td>{{ post.title }}</td>
+                    <td>{{ post.isPublic ? 'published' : 'not published' }}</td>
+                    <td>{{ post.views }}</td>
+                    <td>{{ post.publishedAt.format('d/M/Y H:i:s') }}</td>
+                    <td>{{ post.updatedAt.format('d/M/Y H:i:s') }}</td>
+                    <td>
+                        <a href="{{ path('editPost', {'id': post.id}) }}" class="glyphicon glyphicon-pencil col-sm-1" title="Edit"></a>
+                        <a href="{{ path('postDetail', {'url': post.url}) }}" class="glyphicon glyphicon-eye-open col-sm-1" title="View"></a>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

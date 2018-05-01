@@ -1,0 +1,67 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello !{% endblock %}
+
+{% block body %}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="content">
+                <div class="col-md-2"></div>
+                <div class="col-md-8">
+
+                    <div class="page-header">
+                        <h1>My simple example blog</h1>
+                    </div>
+                {% for post in posts %}
+                    <div class="row">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <a href="{{ path('postDetail', {'url': post.url}) }}">
+                                    <strong>{{ post.title }}</strong>
+                                </a>
+                                <span class="pull-right">{{ post.updatedAt.format('d/m/Y H:i:s') }}</span>
+                            </div>
+                            <div class="panel-body">
+                                {{ (post.text|length > 150 ? post.text|slice(0, 150) ~ '...' : post.text) | striptags  }}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+
+
+                <ul class="pagination">
+                    {% if currentPage == 1 %}
+                        <li class="disabled">
+                            <span aria-hidden="true">&laquo;</span>
+                        </li>
+                    {% else %}
+                        <li>
+                            <a href="{{ path('blogIndex', {'page': currentPage-1}) }}" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                    {% endif %}
+
+                    {% for page in 1..pages %}
+                        <li {% if page == currentPage %} class="active" {% endif %}>
+                            <a href="{{ path('blogIndex', {'page': page}) }}">{{ page }}</a>
+                        </li>
+                    {% endfor %}
+
+                    {% if currentPage == pages %}
+                        <li class="disabled">
+                            <span aria-hidden="true">&raquo;</span>
+                        </li>
+                    {% else %}
+                        <li>
+                            <a href="{{ path('blogIndex', {'page': currentPage+1}) }}" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
