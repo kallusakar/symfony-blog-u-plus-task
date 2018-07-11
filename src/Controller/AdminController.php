@@ -10,6 +10,7 @@ use Cocur\Slugify\Slugify;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 
 class AdminController extends BaseController
@@ -20,7 +21,7 @@ class AdminController extends BaseController
     public function index()
     {
         if ($this->authManager->isLoggedIn()) {
-            return $this->redirectToRoute('adminDashboard');
+            return $this->redirectToRoute('listPost');
         }
 
         return $this->redirectToRoute('adminLogin');
@@ -32,12 +33,10 @@ class AdminController extends BaseController
     public function newPost(Request $request)
     {
         if (!$this->authManager->isLoggedIn()) {
-            return $this->redirectToLogIn();
+            return $this->redirectToLogin();
         }
 
-        $post = new Post();
-
-        $form = $this->createForm(PostType::class, $post);
+        $form = $this->createForm(PostType::class, new Post());
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -67,7 +66,7 @@ class AdminController extends BaseController
             'admin/newPost.html.twig',
             [
                 'form' => $form->createView(),
-                'user' => $this->loggedInUser,
+                'user' => $this->authManager->getUser(),
             ]
         );
     }
@@ -75,13 +74,20 @@ class AdminController extends BaseController
     /**
      * @Route("/admin/post/edit/{id}", name="editPost")
      */
-    public function editPost(Request $request, int $id, PostRepository $postRepository)
-    {
+    public function editPost(
+        Request $request,
+        int $id,
+        PostRepository $postRepository
+    ) {
         if (!$this->authManager->isLoggedIn()) {
-            return $this->redirectToLogIn();
+            return $this->redirectToLogin();
         }
 
         $post = $postRepository->find($id);
+
+        if(!$post) {
+            throw new NotFoundHttpException();
+        }
 
         $form = $this->createForm(PostType::class, $post);
         $form->handleRequest($request);
@@ -100,15 +106,17 @@ class AdminController extends BaseController
             $em->persist($post);
             $em->flush();
 
-
             $this->addFlash(
                 'success',
                 'The blog post has been changed successfully.'
             );
 
-            return $this->redirectToRoute('editPost',
+            return $this->redirectToRoute(
+                'editPost',
                 [
-                    'id' => $post->getId()]);
+                    'id' => $post->getId(),
+                ]
+            );
         }
 
         return $this->render(
@@ -123,7 +131,7 @@ class AdminController extends BaseController
     public function listPost(PostRepository $postRepository)
     {
         if (!$this->authManager->isLoggedIn()) {
-            return $this->redirectToLogIn();
+            return $this->redirectToLogin();
         }
 
         return $this->render(
@@ -138,7 +146,7 @@ class AdminController extends BaseController
     public function login(Request $request): Response
     {
         if ($this->authManager->isLoggedIn()) {
-            return $this->redirectToRoute('adminDashboard');
+            return $this->redirectToRoute('listPost');
         }
 
         $form = $this->createForm(AdminLoginType::class);
@@ -166,14 +174,17 @@ class AdminController extends BaseController
 
         $this->authManager->logout();
 
-        return $this->redirectToLogIn('You\'ve been successfully logged out');
+        return $this->redirectToLogin('You\'ve been successfully logged out');
     }
 
     private function handleUserLogin(Request $request): RedirectResponse
     {
         $formData = $request->get('admin_login');
 
-        if (!$this->authManager->login($formData['username'], $formData['password'])) {
+        if (!$this->authManager->login(
+            $formData['username'],
+            $formData['password']
+        )) {
             $this->addFlash('error', 'Wrong username or password');
 
             return $this->redirectToRoute('adminLogin');

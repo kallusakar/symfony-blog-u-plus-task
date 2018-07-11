@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Component\Paginator;
 use App\Repository\PostRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -10,32 +11,29 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class BlogController extends BaseController
 {
-    private const PER_PAGE = 2;
-
     /**
      * @Route("/", name="blogIndex")
      */
     public function index(Request $request, PostRepository $postRepository)
     {
-        $page = $request->get('page', 1);
-        $count = $postRepository->count(['isPublic' => true]);
+        $paginator = new Paginator($request, $postRepository->count(['isPublic' => true]));
+
 
         return $this->render('blog/index.html.twig', [
+            'paginator' => $paginator,
             'posts' => $postRepository->findBy(
                 ['isPublic' => true],
                 ['updatedAt' => 'DESC'],
-                self::PER_PAGE,
-                ($page-1)*self::PER_PAGE
-            ),
-            'pages' => ceil($count / self::PER_PAGE),
-            'currentPage' => $page,
+                Paginator::PER_PAGE,
+                $paginator->getOffset()
+            )
         ]);
     }
 
     /**
      * @Route("/{url}", name="postDetail")
      */
-    public function detail($url, PostRepository $postRepository, EntityManagerInterface $em)
+    public function detail(string $url, PostRepository $postRepository, EntityManagerInterface $em)
     {
         $post = $postRepository->findOneBy(['url' => $url]);
         if(!$post) {

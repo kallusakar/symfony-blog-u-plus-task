@@ -1,0 +1,33 @@
+{% if paginator.pages > 1 %}
+    <ul class="pagination">
+        {% if paginator.currentPage == 1 %}
+            <li class="disabled">
+                <span aria-hidden="true">&laquo;</span>
+            </li>
+        {% else %}
+            <li>
+                <a href="{{ path(paginator.selfPath, {'page': paginator.currentPage-1}) }}" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+        {% endif %}
+
+        {% for page in 1..paginator.pages %}
+            <li {% if page == paginator.currentPage %} class="active" {% endif %}>
+                <a href="{{ path(paginator.selfPath, {'page': page}) }}">{{ page }}</a>
+            </li>
+        {% endfor %}
+
+        {% if paginator.currentPage == paginator.pages %}
+            <li class="disabled">
+                <span aria-hidden="true">&raquo;</span>
+            </li>
+        {% else %}
+            <li>
+                <a href="{{ path(paginator.selfPath, {'page': paginator.currentPage+1}) }}" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+        {% endif %}
+    </ul>
+{% endif %}

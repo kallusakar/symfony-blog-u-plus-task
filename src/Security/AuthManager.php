@@ -17,12 +17,13 @@ class AuthManager
     public function __construct(SessionInterface $session, UserRepository $userRepository)
     {
         $this->session = $session;
+        $this->userRepository = $userRepository;
+
         $loggedInUser = $session->get('loggedInUser');
 
         if($loggedInUser) {
             $this->loggedInUser = $userRepository->find($loggedInUser->getId());
         }
-        $this->userRepository = $userRepository;
     }
 
     public function isLoggedIn(): bool

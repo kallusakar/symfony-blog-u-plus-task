@@ -55,7 +55,7 @@ class Post
     private $updatedAt;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\User")
+     * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="posts")
      * @ORM\JoinColumn(name="author_id", referencedColumnName="id")
      */
     private $author;
